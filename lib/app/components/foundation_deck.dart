@@ -24,30 +24,35 @@ class _FoundationDeckState extends State<FoundationDeck> {
 
   @override
   Widget build(BuildContext context) {
-    return Draggable(
-      data: widget.deck.isNotEmpty ? [widget.deck.last] : [],
-      feedback: widget.deck.isNotEmpty
-          ? CardWidget(model: widget.deck.last)
-          : const SizedBox.shrink(),
-      childWhenDragging: widget.deck.length > 1
-          ? CardWidget(model: widget.deck[widget.deck.length - 2])
-          : const CardEmptyWidget.ace(),
-      child: DragTarget<List<CardModel>>(
-        builder: (context, candidateData, rejectedData) {
-          return widget.deck.isNotEmpty
-              ? CardWidget(model: widget.deck.last)
-              : const CardEmptyWidget.ace();
-        },
-        onWillAcceptWithDetails: (details) {
-          return controller.canAcceptCardFoundation(details.data, widget.deck);
-        },
-        onAcceptWithDetails: (data) {
-          controller.receiveCards(widget.deck, data.data);
+    return GestureDetector(
+      onTap: () {
+        controller.automaticMoveToTableau([widget.deck.last], widget.deck);
+      },
+      child: Draggable(
+        data: widget.deck.isNotEmpty ? [widget.deck.last] : [],
+        feedback: widget.deck.isNotEmpty
+            ? CardWidget(model: widget.deck.last)
+            : const SizedBox.shrink(),
+        childWhenDragging: widget.deck.length > 1
+            ? CardWidget(model: widget.deck[widget.deck.length - 2])
+            : const CardEmptyWidget.ace(),
+        child: DragTarget<List<CardModel>>(
+          builder: (context, candidateData, rejectedData) {
+            return widget.deck.isNotEmpty
+                ? CardWidget(model: widget.deck.last)
+                : const CardEmptyWidget.ace();
+          },
+          onWillAcceptWithDetails: (details) {
+            return controller.canAcceptCardFoundation(details.data, widget.deck);
+          },
+          onAcceptWithDetails: (data) {
+            controller.receiveCards(widget.deck, data.data);
+          },
+        ),
+        onDragCompleted: () {
+          controller.removeCards(widget.deck, [widget.deck.last]);
         },
       ),
-      onDragCompleted: () {
-        controller.removeCards(widget.deck, [widget.deck.last]);
-      },
     );
   }
 }

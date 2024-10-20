@@ -54,47 +54,52 @@ class _TableauDeckState extends State<TableauDeck> {
                   top: index * 24.0,
                   child: IgnorePointer(
                     ignoring: cardsToMove.any((card) => !card.isFaceUp),
-                    child: Draggable<List<CardModel>>(
-                      data: cardsToMove,
-                      childWhenDragging: widget.deck.length == cardsToMove.length
-                              ? const CardEmptyWidget()
-                              : const SizedBox.shrink(),
-                      feedback: SizedBox(
-                        height: 550,
-                        width: 50,
-                        child: Stack(
-                          children: cardsToMove.asMap().entries.map((entry) {
-                            int feedbackIndex = entry.key;
-                            CardModel feedbackCard = entry.value;
-                            return Positioned(
-                              top: feedbackIndex * 24.0,
-                              child: CardWidget(model: feedbackCard),
-                            );
-                          }).toList(),
+                    child: GestureDetector(
+                      onTap: () {
+                        controller.automaticMove(cardsToMove, deck);
+                      },
+                      child: Draggable<List<CardModel>>(
+                        data: cardsToMove,
+                        childWhenDragging: widget.deck.length == cardsToMove.length
+                                ? const CardEmptyWidget()
+                                : const SizedBox.shrink(),
+                        feedback: SizedBox(
+                          height: 550,
+                          width: 50,
+                          child: Stack(
+                            children: cardsToMove.asMap().entries.map((entry) {
+                              int feedbackIndex = entry.key;
+                              CardModel feedbackCard = entry.value;
+                              return Positioned(
+                                top: feedbackIndex * 24.0,
+                                child: CardWidget(model: feedbackCard),
+                              );
+                            }).toList(),
+                          ),
                         ),
+                        child: DragTarget<List<CardModel>>(
+                          builder: (context, candidateData, rejectedData) {
+                            return draggedCards.contains(card)
+                                ? const SizedBox.shrink()
+                                : CardWidget(model: card);
+                          },
+                          onWillAcceptWithDetails: (details) {
+                            return controller.canAcceptCardTableau(details.data.first, deck);
+                          },
+                          onAcceptWithDetails: (receivedDeck) {
+                            controller.receiveCards(deck, receivedDeck.data);
+                          },
+                        ),
+                        onDragStarted: () {
+                          setState(() => draggedCards = cardsToMove);
+                        },
+                        onDragCompleted: () {
+                          controller.removeCards(deck, draggedCards);
+                        },
+                        onDraggableCanceled: (_, __) {
+                          setState(() => draggedCards.clear());
+                        },
                       ),
-                      child: DragTarget<List<CardModel>>(
-                        builder: (context, candidateData, rejectedData) {
-                          return draggedCards.contains(card)
-                              ? const SizedBox.shrink()
-                              : CardWidget(model: card);
-                        },
-                        onWillAcceptWithDetails: (details) {
-                          return controller.canAcceptCardTableau(details.data.first, deck);
-                        },
-                        onAcceptWithDetails: (receivedDeck) {
-                          controller.receiveCards(deck, receivedDeck.data);
-                        },
-                      ),
-                      onDragStarted: () {
-                        setState(() => draggedCards = cardsToMove);
-                      },
-                      onDragCompleted: () {
-                        controller.removeCards(deck, draggedCards);
-                      },
-                      onDraggableCanceled: (_, __) {
-                        setState(() => draggedCards.clear());
-                      },
                     ),
                   ),
                 );

@@ -86,4 +86,52 @@ class GameController with ChangeNotifier {
     }
     return false;
   }
+
+  void automaticMove(List<CardModel> draggedCards, List<CardModel> sourceDeck) {
+    if (automaticMoveToFoundation(draggedCards, sourceDeck)) return;
+    if (automaticMoveToTableau(draggedCards, sourceDeck)) return;
+  }
+
+  bool automaticMoveToFoundation(List<CardModel> draggedCards, List<CardModel> sourceDeck) {
+    for (List<CardModel> foundationDeck in [
+      foundationDeck1, foundationDeck2,
+      foundationDeck3, foundationDeck4
+    ]) {
+      if (foundationDeck.isEmpty && draggedCards.first.value == CardValue.ace) {
+        receiveCards(foundationDeck, draggedCards);
+        removeCards(sourceDeck, draggedCards);
+        return true;
+      }
+      if (foundationDeck.isNotEmpty &&
+          foundationDeck.last.value.value == draggedCards.first.value.value - 1 &&
+          foundationDeck.last.suit == draggedCards.first.suit) {
+        receiveCards(foundationDeck, draggedCards);
+        removeCards(sourceDeck, draggedCards);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool automaticMoveToTableau(List<CardModel> draggedCards, List<CardModel> sourceDeck) {
+    for (List<CardModel> tableauDeck in [
+      tableauDeck1, tableauDeck2, tableauDeck3,
+      tableauDeck4, tableauDeck5, tableauDeck6,
+      tableauDeck7
+    ]) {
+      if (tableauDeck.isEmpty && draggedCards.first.value == CardValue.king) {
+        receiveCards(tableauDeck, draggedCards);
+        removeCards(sourceDeck, draggedCards);
+        return true;
+      }
+      if (tableauDeck.isNotEmpty &&
+          tableauDeck.last.value.value == draggedCards.first.value.value + 1 &&
+          tableauDeck.last.suit.color != draggedCards.first.suit.color) {
+        receiveCards(tableauDeck, draggedCards);
+        removeCards(sourceDeck, draggedCards);
+        return true;
+      }
+    }
+    return false;
+  }
 }
