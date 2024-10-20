@@ -26,6 +26,7 @@ class _FoundationDeckState extends State<FoundationDeck> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        if (widget.deck.isEmpty) return;
         controller.automaticMoveToTableau([widget.deck.last], widget.deck);
       },
       child: Draggable(
