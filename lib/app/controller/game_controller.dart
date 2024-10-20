@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solitaire/app/controller/sound_controller.dart';
 import 'package:solitaire/app/enums/card_value.dart';
 import 'package:solitaire/app/models/card_model.dart';
 
@@ -42,6 +43,7 @@ class GameController with ChangeNotifier {
   }
 
   void receiveCards(List<CardModel> targetDeck, List<CardModel> receivedCards) {
+    SoundController.playSound('sounds/card_pick.wav');
     targetDeck.addAll(receivedCards.where((card) => !targetDeck.contains(card)));
     notifyListeners();
   }
@@ -55,7 +57,7 @@ class GameController with ChangeNotifier {
     notifyListeners();
   }
 
-  bool canAcceptCard(CardModel receivedCard, List<CardModel> targetDeck) {
+  bool canAcceptCardTableau(CardModel receivedCard, List<CardModel> targetDeck) {
     if (targetDeck.isEmpty && receivedCard.value == CardValue.king) {
       return true;
     }
@@ -64,6 +66,22 @@ class GameController with ChangeNotifier {
       if (receivedCard.value.value == lastCard.value.value - 1 &&
           receivedCard.suit.color != lastCard.suit.color) {
         return true;
+      }
+    }
+    return false;
+  }
+
+  bool canAcceptCardFoundation(List<CardModel> receivedCards, List<CardModel> targetDeck) {
+    if (receivedCards.length == 1) {
+      if (targetDeck.isEmpty && receivedCards.first.value == CardValue.ace) {
+        return true;
+      }
+      if (targetDeck.isNotEmpty) {
+        CardModel lastCard = targetDeck.last;
+        if (receivedCards.first.value.value == lastCard.value.value + 1 &&
+            receivedCards.first.suit == lastCard.suit) {
+          return true;
+        }
       }
     }
     return false;

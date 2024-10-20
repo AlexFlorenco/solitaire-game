@@ -37,7 +37,7 @@ class _TableauDeckState extends State<TableauDeck> {
                     return const CardEmptyWidget();
                   },
                   onWillAcceptWithDetails: (receivedDeck) {
-                    return controller.canAcceptCard(receivedDeck.data.first, deck);
+                    return controller.canAcceptCardTableau(receivedDeck.data.first, deck);
                   },
                   onAcceptWithDetails: (receivedDeck) {
                     controller.receiveCards(deck, receivedDeck.data);
@@ -57,8 +57,8 @@ class _TableauDeckState extends State<TableauDeck> {
                     child: Draggable<List<CardModel>>(
                       data: cardsToMove,
                       childWhenDragging: widget.deck.length == cardsToMove.length
-                          ? const CardEmptyWidget()
-                          : const SizedBox.shrink(),
+                              ? const CardEmptyWidget()
+                              : const SizedBox.shrink(),
                       feedback: SizedBox(
                         height: 550,
                         width: 50,
@@ -80,13 +80,13 @@ class _TableauDeckState extends State<TableauDeck> {
                               : CardWidget(model: card);
                         },
                         onWillAcceptWithDetails: (details) {
-                          return controller.canAcceptCard(details.data.first, deck);
+                          return controller.canAcceptCardTableau(details.data.first, deck);
                         },
                         onAcceptWithDetails: (receivedDeck) {
                           controller.receiveCards(deck, receivedDeck.data);
                         },
                       ),
-                      onDragStarted: () {                 
+                      onDragStarted: () {
                         setState(() => draggedCards = cardsToMove);
                       },
                       onDragCompleted: () {

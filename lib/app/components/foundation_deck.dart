@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:solitaire/app/components/card_empty_widget.dart';
 import 'package:solitaire/app/components/card_widget.dart';
+import 'package:solitaire/app/controller/game_controller.dart';
 import 'package:solitaire/app/models/card_model.dart';
 
 class FoundationDeck extends StatefulWidget {
@@ -13,6 +14,14 @@ class FoundationDeck extends StatefulWidget {
 }
 
 class _FoundationDeckState extends State<FoundationDeck> {
+  late GameController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = GameController.instance;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Draggable(
@@ -30,24 +39,14 @@ class _FoundationDeckState extends State<FoundationDeck> {
               : const CardEmptyWidget.ace();
         },
         onWillAcceptWithDetails: (details) {
-          CardModel card = details.data.first;
-
-          if (details.data.length == 1) {
-            if (widget.deck.isEmpty) {
-              return card.value.value == 1;
-            }
-
-            return card.suit == widget.deck.last.suit &&
-                card.value.value == widget.deck.last.value.value + 1;
-          }
-          return false;
+          return controller.canAcceptCardFoundation(details.data, widget.deck);
         },
         onAcceptWithDetails: (data) {
-          setState(() => widget.deck.add(data.data.first));
+          controller.receiveCards(widget.deck, data.data);
         },
       ),
       onDragCompleted: () {
-        setState(() => widget.deck.removeLast());
+        controller.removeCards(widget.deck, [widget.deck.last]);
       },
     );
   }
