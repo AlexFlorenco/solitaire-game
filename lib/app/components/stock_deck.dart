@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:solitaire/app/components/card_empty_widget.dart';
 import 'package:solitaire/app/components/card_widget.dart';
+import 'package:solitaire/app/controller/game_controller.dart';
 import 'package:solitaire/app/controller/sound_controller.dart';
 import 'package:solitaire/app/models/card_model.dart';
 
@@ -15,10 +18,12 @@ class StockDeck extends StatefulWidget {
 
 class _StockDeckState extends State<StockDeck> {
   late List<CardModel> deck;
+  late GameController controller;
 
   @override
   void initState() {
     super.initState();
+    controller = GameController.instance;
     deck = widget.deck;
   }
 
@@ -45,23 +50,49 @@ class _StockDeckState extends State<StockDeck> {
               left: card.isFaceUp ? 0 : 53,
               duration: const Duration(milliseconds: 400),
               child: GestureDetector(
-                child: Draggable<List<CardModel>>(
-                  data: [card],
-                  childWhenDragging: card == deck.last
-                      ? const SizedBox.shrink()
-                      : CardWidget(model: deck[deck.length - 2]),
-                  feedback: CardWidget(model: card),
-                  child: CardWidget(model: card),
-                  onDragCompleted: () => setState(() {
-                    deck.removeLast();
-                  }),
-                ),
                 onTap: () => setState(() {
-                  SoundController.playSound('sounds/card_pick.wav');
-                  card.isFaceUp = true;
-                  deck.remove(card);
-                  deck.add(card);
+                  if (card.isFaceUp) {
+                    controller.automaticMove([card], deck);
+                    return;
+                  } else {
+                    SoundController.playSound('sounds/card_pick.wav');
+                    card.isFaceUp = true;
+                    deck.remove(card);
+                    deck.add(card);
+                  }
                 }),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  transitionBuilder: (Widget child, Animation<double> animation) {
+                    final rotate = Tween(begin: 1.0, end: 0.0).animate(animation);
+
+                    return AnimatedBuilder(
+                      animation: rotate,
+                      child: child,
+                      builder: (context, child) {
+                        return Transform(
+                          transform: Matrix4.rotationY(min(rotate.value, 0.5) * pi),
+                          alignment: Alignment.center,
+                          child: child,
+                        );
+                      },
+                    );
+                  },
+                  child: card.isFaceUp
+                      ? Draggable<List<CardModel>>(
+                          key: ValueKey(card.isFaceUp),
+                          data: [card],
+                          childWhenDragging: card == deck.last
+                              ? const SizedBox.shrink()
+                              : CardWidget(model: deck[deck.length - 2]),
+                          feedback: CardWidget(model: card),
+                          child: CardWidget(model: card),
+                          onDragCompleted: () => setState(() {
+                            deck.removeLast();
+                          }),
+                        )
+                      : CardWidget(model: card),
+                ),
               ),
             );
           }),
