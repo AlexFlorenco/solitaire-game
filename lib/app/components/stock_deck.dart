@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:solitaire/app/components/card_empty_widget.dart';
 import 'package:solitaire/app/components/card_widget.dart';
+import 'package:solitaire/app/controller/sound_controller.dart';
 import 'package:solitaire/app/models/card_model.dart';
 
 class StockDeck extends StatefulWidget {
@@ -56,6 +57,7 @@ class _StockDeckState extends State<StockDeck> {
                   }),
                 ),
                 onTap: () => setState(() {
+                  SoundController.playSound('sounds/card_pick.wav');
                   card.isFaceUp = true;
                   deck.remove(card);
                   deck.add(card);
