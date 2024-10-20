@@ -13,44 +13,58 @@ class StockDeck extends StatefulWidget {
 }
 
 class _StockDeckState extends State<StockDeck> {
-  List<CardModel> get deckClosed => widget.deck;
-  List<CardModel> deckOpened = [];
+  late List<CardModel> deck;
+
+  @override
+  void initState() {
+    super.initState();
+    deck = widget.deck;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        deckOpened.isNotEmpty
-            ? Draggable<List<CardModel>>(
-                data: [deckOpened.last],
-                childWhenDragging: deckOpened.length > 1
-                    ? CardWidget(model: deckOpened[deckOpened.length - 2])
-                    : const SizedBox.shrink(),
-                feedback: CardWidget(model: deckOpened.last),
-                child: CardWidget(model: deckOpened.last),
-                onDragCompleted: () {
-                  setState(() => deckOpened.removeLast());
-                },
-              )
-            : const SizedBox.shrink(),
-        const SizedBox(width: 4),
-        GestureDetector(
-          child: deckClosed.isEmpty
-              ? const CardEmptyWidget.restart()
-              : const CardEmptyWidget.back(),
-          onTap: () {
-            setState(() {
-              if (deckClosed.isEmpty) {
-                deckClosed.addAll(deckOpened);
-                deckOpened.clear();
-              } else {
-                deckOpened.add(deckClosed.removeAt(0));
-                deckOpened.last.isFaceUp = true;
+    return SizedBox(
+      width: 103,
+      height: 78,
+      child: Stack(
+        alignment: Alignment.topRight,
+        children: [
+          GestureDetector(
+            onTap: () => setState(() {
+              for (var card in deck) {
+                card.isFaceUp = false;
               }
-            });
-          },
-        ),
-      ],
+              deck = deck.reversed.toList();
+            }),
+            child: const CardEmptyWidget.restart(),
+          ),
+          ...deck.map((card) {
+            return AnimatedPositioned(
+              key: ValueKey(card),
+              left: card.isFaceUp ? 0 : 53,
+              duration: const Duration(milliseconds: 400),
+              child: GestureDetector(
+                child: Draggable<List<CardModel>>(
+                  data: [card],
+                  childWhenDragging: card == deck.last
+                      ? const SizedBox.shrink()
+                      : CardWidget(model: deck[deck.length - 2]),
+                  feedback: CardWidget(model: card),
+                  child: CardWidget(model: card),
+                  onDragCompleted: () => setState(() {
+                    deck.removeLast();
+                  }),
+                ),
+                onTap: () => setState(() {
+                  card.isFaceUp = true;
+                  deck.remove(card);
+                  deck.add(card);
+                }),
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 }
