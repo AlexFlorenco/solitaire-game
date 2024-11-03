@@ -6,6 +6,7 @@ import 'package:solitaire/app/components/card_widget.dart';
 import 'package:solitaire/app/controller/game_controller.dart';
 import 'package:solitaire/app/controller/sound_controller.dart';
 import 'package:solitaire/app/models/card_model.dart';
+import 'package:solitaire/app/service/ads_service.dart';
 
 class StockDeck extends StatefulWidget {
   final List<CardModel> deck;
@@ -36,12 +37,16 @@ class _StockDeckState extends State<StockDeck> {
         alignment: Alignment.topRight,
         children: [
           GestureDetector(
-            onTap: () => setState(() {
-              for (var card in deck) {
-                card.isFaceUp = false;
-              }
-              deck = deck.reversed.toList();
-            }),
+            onTap: () {
+              AdsService.showInterstitialAd(callback: () {
+                setState(() {
+                  for (var card in deck) {
+                    card.isFaceUp = false;
+                  }
+                  deck = deck.reversed.toList();
+                });
+              });
+            },
             child: const CardEmptyWidget.restart(),
           ),
           ...deck.map((card) {
