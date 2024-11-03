@@ -12,6 +12,10 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   audioplayers: ^6.1.0
+  ads:
+    git:
+      url: https://github.com/AlexFlorenco/ads.git
+  shared_preferences: ^2.3.2
 
 dev_dependencies:
   flutter_test:
