@@ -19,4 +19,20 @@ class CardModel {
           CardModel(suit: suit, value: value)
     ];
   }
+
+  factory CardModel.fromJson(Map<String, dynamic> json) {
+    return CardModel(
+      suit: CardSuit.values.firstWhere((e) => e.toString() == json['suit']),
+      value: CardValue.values.firstWhere((e) => e.toString() == json['value']),
+      isFaceUp: json['isFaceUp'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'suit': suit.toString(),
+      'value': value.toString(),
+      'isFaceUp': isFaceUp,
+    };
+  }
 }
