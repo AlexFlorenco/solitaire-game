@@ -1,11 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:solitaire/app/controller/sound_controller.dart';
+import 'package:solitaire/app/controller/timer_controller.dart';
 import 'package:solitaire/app/enums/card_value.dart';
 import 'package:solitaire/app/models/card_model.dart';
+import 'package:solitaire/app/models/game_state.dart';
+import 'package:solitaire/app/service/local_storage_service.dart';
 
 class GameController with ChangeNotifier {
   GameController._();
   static final GameController instance = GameController._();
+  TimerController timer = TimerController.instance;
 
   List<CardModel> fullDeck = [];
 
@@ -40,11 +46,75 @@ class GameController with ChangeNotifier {
     }
 
     stockDeck = fullDeck;
+    timer.startTimer();
+  }
+
+  void resetGame() {
+    timer.stopTimer();
+    fullDeck.clear();
+    stockDeck.clear();
+    foundationDeck1.clear();
+    foundationDeck2.clear();
+    foundationDeck3.clear();
+    foundationDeck4.clear();
+    tableauDeck1.clear();
+    tableauDeck2.clear();
+    tableauDeck3.clear();
+    tableauDeck4.clear();
+    tableauDeck5.clear();
+    tableauDeck6.clear();
+    tableauDeck7.clear();
+  }
+
+  void saveGame() {
+    GameState gameState = GameState(
+      fullDeck: fullDeck,
+      stockDeck: stockDeck,
+      foundationDeck1: foundationDeck1,
+      foundationDeck2: foundationDeck2,
+      foundationDeck3: foundationDeck3,
+      foundationDeck4: foundationDeck4,
+      tableauDeck1: tableauDeck1,
+      tableauDeck2: tableauDeck2,
+      tableauDeck3: tableauDeck3,
+      tableauDeck4: tableauDeck4,
+      tableauDeck5: tableauDeck5,
+      tableauDeck6: tableauDeck6,
+      tableauDeck7: tableauDeck7,
+      elapsedTime: timer.time.value,
+    );
+
+    LocalStorageService().saveData('game_state', json.encode(gameState.toJson()));
+  }
+
+  void loadGame() async {
+    var gameState = json.decode(await LocalStorageService().getData('game_state'));
+
+    if (gameState == null) return;
+    
+    GameState loadedGame = GameState.fromJson(gameState);
+    fullDeck = loadedGame.fullDeck;
+    stockDeck = loadedGame.stockDeck;
+    foundationDeck1 = loadedGame.foundationDeck1;
+    foundationDeck2 = loadedGame.foundationDeck2;
+    foundationDeck3 = loadedGame.foundationDeck3;
+    foundationDeck4 = loadedGame.foundationDeck4;
+    tableauDeck1 = loadedGame.tableauDeck1;
+    tableauDeck2 = loadedGame.tableauDeck2;
+    tableauDeck3 = loadedGame.tableauDeck3;
+    tableauDeck4 = loadedGame.tableauDeck4;
+    tableauDeck5 = loadedGame.tableauDeck5;
+    tableauDeck6 = loadedGame.tableauDeck6;
+    tableauDeck7 = loadedGame.tableauDeck7;
+    timer.time.value = loadedGame.elapsedTime;
+
+    notifyListeners();
   }
 
   void receiveCards(List<CardModel> targetDeck, List<CardModel> receivedCards) {
     SoundController.playSound('sounds/card_pick.wav');
     targetDeck.addAll(receivedCards.where((card) => !targetDeck.contains(card)));
+    saveGame();
     notifyListeners();
   }
 
@@ -54,6 +124,7 @@ class GameController with ChangeNotifier {
       sourceDeck.last.isFaceUp = true;
     }
     draggedCards.clear();
+    saveGame();
     notifyListeners();
   }
 
@@ -103,6 +174,7 @@ class GameController with ChangeNotifier {
         return true;
       }
       if (foundationDeck.isNotEmpty &&
+          draggedCards.length == 1 &&
           foundationDeck.last.value.value == draggedCards.first.value.value - 1 &&
           foundationDeck.last.suit == draggedCards.first.suit) {
         receiveCards(foundationDeck, draggedCards);
