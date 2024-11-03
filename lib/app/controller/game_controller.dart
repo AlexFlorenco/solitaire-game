@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:solitaire/app/controller/sound_controller.dart';
-import 'package:solitaire/app/controller/timer_controller.dart';
 import 'package:solitaire/app/enums/card_value.dart';
 import 'package:solitaire/app/models/card_model.dart';
 import 'package:solitaire/app/models/game_state.dart';
@@ -11,7 +10,7 @@ import 'package:solitaire/app/service/local_storage_service.dart';
 class GameController with ChangeNotifier {
   GameController._();
   static final GameController instance = GameController._();
-  TimerController timer = TimerController.instance;
+  ValueNotifier<bool> isGameWon = ValueNotifier<bool>(false);
 
   List<CardModel> fullDeck = [];
 
@@ -46,11 +45,11 @@ class GameController with ChangeNotifier {
     }
 
     stockDeck = fullDeck;
-    timer.startTimer();
+    isGameWon.value = false;
+    notifyListeners();
   }
 
   void resetGame() {
-    timer.stopTimer();
     fullDeck.clear();
     stockDeck.clear();
     foundationDeck1.clear();
@@ -81,7 +80,6 @@ class GameController with ChangeNotifier {
       tableauDeck5: tableauDeck5,
       tableauDeck6: tableauDeck6,
       tableauDeck7: tableauDeck7,
-      elapsedTime: timer.time.value,
     );
 
     LocalStorageService().saveData('game_state', json.encode(gameState.toJson()));
@@ -106,8 +104,7 @@ class GameController with ChangeNotifier {
     tableauDeck5 = loadedGame.tableauDeck5;
     tableauDeck6 = loadedGame.tableauDeck6;
     tableauDeck7 = loadedGame.tableauDeck7;
-    timer.time.value = loadedGame.elapsedTime;
-
+    checkWin();
     notifyListeners();
   }
 
@@ -115,6 +112,7 @@ class GameController with ChangeNotifier {
     SoundController.playSound('sounds/card_pick.wav');
     targetDeck.addAll(receivedCards.where((card) => !targetDeck.contains(card)));
     saveGame();
+    checkWin();
     notifyListeners();
   }
 
@@ -125,7 +123,6 @@ class GameController with ChangeNotifier {
     }
     draggedCards.clear();
     saveGame();
-    notifyListeners();
   }
 
   bool canAcceptCardTableau(CardModel receivedCard, List<CardModel> targetDeck) {
@@ -205,5 +202,14 @@ class GameController with ChangeNotifier {
       }
     }
     return false;
+  }
+
+  void checkWin() {
+    if (foundationDeck1.length == 13 &&
+        foundationDeck2.length == 13 &&
+        foundationDeck3.length == 13 &&
+        foundationDeck4.length == 13) {
+      isGameWon.value = true;
+    }
   }
 }

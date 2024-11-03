@@ -1,34 +1,36 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
+// import 'dart:async';
+// import 'package:flutter/material.dart';
 
-class TimerController {
-  TimerController._();
-  static final TimerController instance = TimerController._();
+// class TimerController {
+//   TimerController._();
+//   static final TimerController instance = TimerController._();
 
-  ValueNotifier<int> time = ValueNotifier<int>(0);
-  Timer? timer;
-  int _elapsedTime = 0;
+//   ValueNotifier<int> time = ValueNotifier<int>(0);
+//   Timer? timer;
+//   int _elapsedTime = 0;
 
-  void startTimer() {
-    timer?.cancel();
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _elapsedTime += 1;
-      time.value = _elapsedTime;
-    });
-  }
+//   void startTimer({int? elapsedTime}) {
+//     timer?.cancel();
+//     _elapsedTime = elapsedTime ?? 0;
 
-  void pauseTimer() {
-    timer?.cancel();
-  }
+//     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+//       _elapsedTime += 1;
+//       time.value = _elapsedTime;
+//     });
+//   }
 
-  void stopTimer() {
-    timer?.cancel();
-    _elapsedTime = 0;
-    time.value = 0;
-  }
+//   void pauseTimer() {
+//     timer?.cancel();
+//   }
 
-  void resetTimer() {
-    stopTimer();
-    startTimer();
-  }
-}
+//   void stopTimer() {
+//     timer?.cancel();
+//     _elapsedTime = 0;
+//     time.value = 0;
+//   }
+
+//   void resetTimer() {
+//     stopTimer();
+//     startTimer();
+//   }
+// }

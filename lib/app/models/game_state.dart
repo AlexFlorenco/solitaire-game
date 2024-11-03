@@ -14,7 +14,6 @@ class GameState {
   final List<CardModel> tableauDeck5;
   final List<CardModel> tableauDeck6;
   final List<CardModel> tableauDeck7;
-  final int elapsedTime;
 
   GameState({
     required this.fullDeck,
@@ -30,7 +29,6 @@ class GameState {
     required this.tableauDeck5,
     required this.tableauDeck6,
     required this.tableauDeck7,
-    required this.elapsedTime,
   });
 
   Map<String, dynamic> toJson() {
@@ -48,7 +46,6 @@ class GameState {
       'tableauDeck5': tableauDeck5.map((card) => card.toJson()).toList(),
       'tableauDeck6': tableauDeck6.map((card) => card.toJson()).toList(),
       'tableauDeck7': tableauDeck7.map((card) => card.toJson()).toList(),
-      'elapsedTime': elapsedTime,
     };
   }
 
@@ -67,7 +64,6 @@ class GameState {
       tableauDeck5: (json['tableauDeck5'] as List).map((card) => CardModel.fromJson(card)).toList(),
       tableauDeck6: (json['tableauDeck6'] as List).map((card) => CardModel.fromJson(card)).toList(),
       tableauDeck7: (json['tableauDeck7'] as List).map((card) => CardModel.fromJson(card)).toList(),
-      elapsedTime: json['elapsedTime'],
     );
   }
 }

@@ -20,6 +20,7 @@ class AdsService {
     AppOpenAdManager.instance.loadAndShowAd(
       callback: () => callback(),
     );
+    pausedByAd = true;
   }
 
   static void advanceLoadInterstitialAd() {

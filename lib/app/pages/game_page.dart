@@ -20,9 +20,33 @@ class _GamePageState extends State<GamePage> {
   void initState() {
     super.initState();
     controller = GameController.instance;
-    controller.addListener(() {
-      if (mounted) setState(() {});
-    });
+    controller.addListener(
+      () {
+        if (mounted) {
+          setState(() {
+            if (controller.isGameWon.value) {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog.adaptive(
+                      title: const Text('Parabéns!'),
+                      content: const Text('Você ganhou o jogo!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            controller.resetGame();
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Play Again'),
+                        ),
+                      ],
+                    );
+                  });
+            }
+          });
+        }
+      },
+    );
   }
 
   @override

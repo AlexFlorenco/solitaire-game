@@ -26,21 +26,6 @@ class _GameAppBarState extends State<GameAppBar> {
       ),
       foregroundColor: Colors.white,
       backgroundColor: Colors.green,
-      title: ValueListenableBuilder(
-        valueListenable: controller.timer.time,
-        builder: (context, int time, child) {
-          final int minutes = time ~/ 60;
-          final int seconds = time % 60;
-          return Text(
-            '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-            style: const TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          );
-        },
-      ),
     );
   }
 }

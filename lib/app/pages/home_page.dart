@@ -66,7 +66,6 @@ class HomePage extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            const Align(child: Text('Tempo mais rápido: 00:00')),
           ],
         ),
       ),

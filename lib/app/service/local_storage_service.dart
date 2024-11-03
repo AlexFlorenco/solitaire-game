@@ -10,4 +10,14 @@ class LocalStorageService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key) ?? '';
   }
+
+  Future<void> saveTimer(String key, int value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt(key, value);
+  }
+
+  Future<int> getTimer(String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(key) ?? 0;
+  }
 }
