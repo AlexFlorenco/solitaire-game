@@ -1,5 +1,7 @@
+import 'package:ads/ads.dart';
 import 'package:flutter/material.dart';
 import 'package:solitaire/app/components/foundation_deck.dart';
+import 'package:solitaire/app/components/game_app_bar.dart';
 import 'package:solitaire/app/components/tableau_deck.dart';
 import 'package:solitaire/app/components/stock_deck.dart';
 import 'package:solitaire/app/controller/game_controller.dart';
@@ -18,17 +20,35 @@ class _GamePageState extends State<GamePage> {
   void initState() {
     super.initState();
     controller = GameController.instance;
-    controller.startGame();
-    controller.addListener(() => setState(() {}));
+    controller.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(() {
+      if (mounted) setState(() {});
+    });
+    controller.resetGame();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const GameAppBar(),
+      bottomSheet: ColoredBox(
+        color: Colors.green[800]!,
+        child: const Padding(
+          padding: EdgeInsets.only(bottom: 24),
+          child: BannerWidget.inline(),
+        ),
+      ),
       backgroundColor: Colors.green,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
           child: Column(
             children: [
               Row(
